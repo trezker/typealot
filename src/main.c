@@ -25,15 +25,47 @@ void abort_dialog(char const *format, ...) {
 	exit(1);
 }
 
-char* dictionary[] = {
-	"it",
-	"eats",
-	"pigs",
-	"and",
-	"cows"
-};
+#define MAX_WORDS 80000
+ALLEGRO_USTR* dictionary[MAX_WORDS];
+int words = 0;
+
+void load_dictionary(const char* filename) {
+	printf("Loading dictionary\n");
+	FILE* f = fopen(filename, "r");
+	char w[100];
+	int removed = 0;
+	while(fgets(w, 100, f)) {
+		if(words == MAX_WORDS) {
+			printf("Dictionary file has more words than is supported\n");
+			break;
+		}
+		ALLEGRO_USTR *ustr = al_ustr_new(w);
+		al_ustr_rtrim_ws(ustr);
+		if(-1 != al_ustr_find_cstr(ustr, 0, "'s")) {
+			++removed;
+			continue;
+		}
+		dictionary[words++] = ustr;
+		//printf("%s", w);
+	}
+	fclose(f);
+	printf("Dictionary loaded. Removed %i, kept %i\n", removed, words);
+}
+
+void add_word(ALLEGRO_USTR* str) {
+	al_ustr_append(str, dictionary[rand()%words]);
+	al_ustr_append_cstr(str, " ");
+}
+
+void initial_words(ALLEGRO_USTR* str) {
+	for(int i = 0; i < 3; ++i) {
+		add_word(str);
+	}
+}
 
 int main() {
+	load_dictionary("data/words.txt");
+
 	ALLEGRO_DISPLAY *display;
 	ALLEGRO_EVENT_QUEUE *queue;
 	ALLEGRO_EVENT event;
@@ -71,10 +103,7 @@ int main() {
 	ALLEGRO_USTR *next = al_ustr_new("");
 	ALLEGRO_USTR *prev = al_ustr_new("");
 
-	for(int i = 0; i < 3; ++i) {
-		al_ustr_append_cstr(next, dictionary[i]);
-		al_ustr_append_cstr(next, " ");
-	}
+	initial_words(next);
 
 	int done = 0;
 	while(!done) {
@@ -92,6 +121,15 @@ int main() {
 					if(0 == al_ustr_find_chr(next, 0, event.keyboard.unichar)) {
 						al_ustr_append_chr(prev, event.keyboard.unichar);
 						al_ustr_remove_chr(next, 0);
+						//printf("%i\n", event.keyboard.unichar);
+						if(event.keyboard.unichar == 32) {
+							add_word(next);
+						}
+					}
+					else {
+						al_ustr_assign_cstr(prev, "");
+						al_ustr_assign_cstr(next, "");
+						initial_words(next);
 					}
 					break;
 			}
