@@ -64,6 +64,7 @@ void initial_words(ALLEGRO_USTR* str) {
 }
 
 int main() {
+	srand(time(NULL));
 	load_dictionary("data/words.txt");
 
 	ALLEGRO_DISPLAY *display;
@@ -105,6 +106,8 @@ int main() {
 
 	initial_words(next);
 
+	double start_time = -1;
+
 	int done = 0;
 	while(!done) {
 		while(al_get_next_event(queue, &event)) {
@@ -119,6 +122,9 @@ int main() {
 					break;
 				case ALLEGRO_EVENT_KEY_CHAR:
 					if(0 == al_ustr_find_chr(next, 0, event.keyboard.unichar)) {
+						if(start_time<0) {
+							start_time = al_get_time();
+						}
 						al_ustr_append_chr(prev, event.keyboard.unichar);
 						al_ustr_remove_chr(next, 0);
 						//printf("%i\n", event.keyboard.unichar);
@@ -130,6 +136,7 @@ int main() {
 						al_ustr_assign_cstr(prev, "");
 						al_ustr_assign_cstr(next, "");
 						initial_words(next);
+						start_time = -1;
 					}
 					break;
 			}
@@ -137,9 +144,15 @@ int main() {
 
 		al_clear_to_color(black);
 
-		//al_draw_text(font, white, width/2, height/2, ALLEGRO_ALIGN_CENTRE, "Hello world!");
+		double time = 60;
+		if(start_time > 0) {
+			time -= (al_get_time()-start_time);
+		}
+		al_draw_textf(font, white, width/2, 0, ALLEGRO_ALIGN_CENTRE, "%.1f", time);
 		al_draw_ustr(font, grey, width/2, height/2, ALLEGRO_ALIGN_RIGHT, prev);
 		al_draw_ustr(font, white, width/2, height/2, ALLEGRO_ALIGN_LEFT, next);
+
+		al_draw_line(width/2, height/2, width/2, height/2+40, white, 2);
 
 		al_flip_display();
 
