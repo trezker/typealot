@@ -9,4 +9,4 @@ add_executable(typealot ${typealot_SRC})
 target_compile_options(typealot PRIVATE
   -Winline -Wunused -Wall -Wextra -Wshadow -Wcast-align -Wpedantic -Werror
 )
-target_link_libraries(typealot allegro allegro_primitives allegro_dialog)
+target_link_libraries(typealot allegro allegro_font allegro_ttf allegro_primitives allegro_dialog)
