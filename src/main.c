@@ -58,7 +58,7 @@ void add_word(ALLEGRO_USTR* str) {
 }
 
 void initial_words(ALLEGRO_USTR* str) {
-	for(int i = 0; i < 3; ++i) {
+	for(int i = 0; i < 5; ++i) {
 		add_word(str);
 	}
 }
@@ -83,8 +83,8 @@ int main() {
 
 	al_set_new_display_flags(ALLEGRO_OPENGL);
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 24, ALLEGRO_REQUIRE);
-	int width = 640;
-	int height = 120;
+	int width = 800;
+	int height = 200;
 	display = al_create_display(width, height);
 	if (!display) {
 		abort_dialog("Error creating display\n");
@@ -107,6 +107,9 @@ int main() {
 	initial_words(next);
 
 	double start_time = -1;
+	int typed = 0;
+	int wpm = 0;
+	int bestwpm = 0;
 
 	int done = 0;
 	while(!done) {
@@ -122,6 +125,7 @@ int main() {
 					break;
 				case ALLEGRO_EVENT_KEY_CHAR:
 					if(0 == al_ustr_find_chr(next, 0, event.keyboard.unichar)) {
+						++typed;
 						if(start_time<0) {
 							start_time = al_get_time();
 						}
@@ -133,10 +137,14 @@ int main() {
 						}
 					}
 					else {
+						if(wpm > bestwpm) {
+							bestwpm = wpm;
+						}
 						al_ustr_assign_cstr(prev, "");
 						al_ustr_assign_cstr(next, "");
 						initial_words(next);
 						start_time = -1;
+						typed = 0;
 					}
 					break;
 			}
@@ -145,10 +153,15 @@ int main() {
 		al_clear_to_color(black);
 
 		double time = 60;
+		double elapsed = 0;
 		if(start_time > 0) {
-			time -= (al_get_time()-start_time);
+			elapsed = al_get_time()-start_time;
+			time -= (elapsed);
+			wpm = (typed/5)/(elapsed/60.f);
 		}
-		al_draw_textf(font, white, width/2, 0, ALLEGRO_ALIGN_CENTRE, "%.1f", time);
+		al_draw_textf(font, white, width/2, 0, ALLEGRO_ALIGN_CENTRE, "%.1f", elapsed);
+		al_draw_textf(font, white, 0, 0, ALLEGRO_ALIGN_LEFT, "WPM: %i", wpm);
+		al_draw_textf(font, white, width, 0, ALLEGRO_ALIGN_RIGHT, "Best WPM: %i", bestwpm);
 		al_draw_ustr(font, grey, width/2, height/2, ALLEGRO_ALIGN_RIGHT, prev);
 		al_draw_ustr(font, white, width/2, height/2, ALLEGRO_ALIGN_LEFT, next);
 
