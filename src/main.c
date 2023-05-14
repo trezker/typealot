@@ -107,6 +107,8 @@ int main() {
 	initial_words(next);
 
 	double start_time = -1;
+	double elapsed = 0;
+	double besttime = 0;
 	int typed = 0;
 	int wpm = 0;
 	int bestwpm = 0;
@@ -140,10 +142,14 @@ int main() {
 						if(wpm > bestwpm) {
 							bestwpm = wpm;
 						}
+						if(elapsed > besttime) {
+							besttime = elapsed;
+						}
 						al_ustr_assign_cstr(prev, "");
 						al_ustr_assign_cstr(next, "");
 						initial_words(next);
 						start_time = -1;
+						elapsed = 0;
 						typed = 0;
 					}
 					break;
@@ -152,16 +158,14 @@ int main() {
 
 		al_clear_to_color(black);
 
-		double time = 60;
-		double elapsed = 0;
 		if(start_time > 0) {
 			elapsed = al_get_time()-start_time;
-			time -= (elapsed);
 			wpm = (typed/5)/(elapsed/60.f);
 		}
 		al_draw_textf(font, white, width/2, 0, ALLEGRO_ALIGN_CENTRE, "%.1f", elapsed);
 		al_draw_textf(font, white, 0, 0, ALLEGRO_ALIGN_LEFT, "WPM: %i", wpm);
 		al_draw_textf(font, white, width, 0, ALLEGRO_ALIGN_RIGHT, "Best WPM: %i", bestwpm);
+		al_draw_textf(font, white, width, 40, ALLEGRO_ALIGN_RIGHT, "Best time: %.1f", besttime);
 		al_draw_ustr(font, grey, width/2, height/2, ALLEGRO_ALIGN_RIGHT, prev);
 		al_draw_ustr(font, white, width/2, height/2, ALLEGRO_ALIGN_LEFT, next);
 
