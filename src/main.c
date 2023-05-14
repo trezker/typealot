@@ -133,6 +133,7 @@ int main() {
 						++typed;
 						if(start_time<0) {
 							start_time = al_get_time();
+							wordcount = 0;
 						}
 						al_ustr_append_chr(prev, event.keyboard.unichar);
 						al_ustr_remove_chr(next, 0);
@@ -156,7 +157,6 @@ int main() {
 						al_ustr_assign_cstr(next, "");
 						initial_words(next);
 						start_time = -1;
-						wordcount = 0;
 						elapsed = 0;
 						typed = 0;
 					}
