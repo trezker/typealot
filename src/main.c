@@ -95,7 +95,8 @@ int main() {
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_display_event_source(display));
 
-	ALLEGRO_FONT *font = al_load_ttf_font("data/DejaVuSans.ttf", 42, 0);
+	ALLEGRO_FONT *font = al_load_ttf_font("data/DejaVuSans.ttf", 40, 0);
+	ALLEGRO_FONT *fontsmall = al_load_ttf_font("data/DejaVuSans.ttf", 20, 0);
 
 	ALLEGRO_COLOR black = al_map_rgb_f(0, 0, 0);
 	ALLEGRO_COLOR grey = al_map_rgb_f(0.5, 0.5, 0.5);
@@ -109,6 +110,8 @@ int main() {
 	double start_time = -1;
 	double elapsed = 0;
 	double besttime = 0;
+	int wordcount = 0;
+	int bestwords = 0;
 	int typed = 0;
 	int wpm = 0;
 	int bestwpm = 0;
@@ -136,6 +139,7 @@ int main() {
 						//printf("%i\n", event.keyboard.unichar);
 						if(event.keyboard.unichar == 32) {
 							add_word(next);
+							++wordcount;
 						}
 					}
 					else {
@@ -145,10 +149,14 @@ int main() {
 						if(elapsed > besttime) {
 							besttime = elapsed;
 						}
+						if(wordcount > bestwords) {
+							bestwords = wordcount;
+						}
 						al_ustr_assign_cstr(prev, "");
 						al_ustr_assign_cstr(next, "");
 						initial_words(next);
 						start_time = -1;
+						wordcount = 0;
 						elapsed = 0;
 						typed = 0;
 					}
@@ -162,10 +170,15 @@ int main() {
 			elapsed = al_get_time()-start_time;
 			wpm = (typed/5)/(elapsed/60.f);
 		}
-		al_draw_textf(font, white, width/2, 0, ALLEGRO_ALIGN_CENTRE, "%.1f", elapsed);
-		al_draw_textf(font, white, 0, 0, ALLEGRO_ALIGN_LEFT, "WPM: %i", wpm);
-		al_draw_textf(font, white, width, 0, ALLEGRO_ALIGN_RIGHT, "Best WPM: %i", bestwpm);
-		al_draw_textf(font, white, width, 40, ALLEGRO_ALIGN_RIGHT, "Best time: %.1f", besttime);
+		al_draw_textf(fontsmall, white, 0, 0, ALLEGRO_ALIGN_LEFT, "WPM: %i", wpm);
+		al_draw_textf(fontsmall, white, 0, 40, ALLEGRO_ALIGN_LEFT, "Words: %i", wordcount);
+
+		al_draw_textf(fontsmall, white, width/2, 0, ALLEGRO_ALIGN_CENTRE, "%.1f", elapsed);
+		al_draw_textf(fontsmall, white, width/2, 40, ALLEGRO_ALIGN_CENTRE, "Best words %i", bestwords);
+
+		al_draw_textf(fontsmall, white, width, 0, ALLEGRO_ALIGN_RIGHT, "Best WPM: %i", bestwpm);
+		al_draw_textf(fontsmall, white, width, 40, ALLEGRO_ALIGN_RIGHT, "Best time: %.1f", besttime);
+
 		al_draw_ustr(font, grey, width/2, height/2, ALLEGRO_ALIGN_RIGHT, prev);
 		al_draw_ustr(font, white, width/2, height/2, ALLEGRO_ALIGN_LEFT, next);
 
