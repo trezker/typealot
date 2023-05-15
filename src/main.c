@@ -134,6 +134,7 @@ int main() {
 						if(start_time<0) {
 							start_time = al_get_time();
 							wordcount = 0;
+							elapsed = 0;
 						}
 						al_ustr_append_chr(prev, event.keyboard.unichar);
 						al_ustr_remove_chr(next, 0);
@@ -157,7 +158,6 @@ int main() {
 						al_ustr_assign_cstr(next, "");
 						initial_words(next);
 						start_time = -1;
-						elapsed = 0;
 						typed = 0;
 					}
 					break;
@@ -171,13 +171,13 @@ int main() {
 			wpm = (typed/5)/(elapsed/60.f);
 		}
 		al_draw_textf(fontsmall, white, 0, 0, ALLEGRO_ALIGN_LEFT, "WPM: %i", wpm);
-		al_draw_textf(fontsmall, white, 0, 40, ALLEGRO_ALIGN_LEFT, "Words: %i", wordcount);
+		al_draw_textf(fontsmall, white, 0, 40, ALLEGRO_ALIGN_LEFT, "Best WPM: %i", bestwpm);
 
 		al_draw_textf(fontsmall, white, width/2, 0, ALLEGRO_ALIGN_CENTRE, "%.1f", elapsed);
-		al_draw_textf(fontsmall, white, width/2, 40, ALLEGRO_ALIGN_CENTRE, "Best words %i", bestwords);
+		al_draw_textf(fontsmall, white, width/2, 40, ALLEGRO_ALIGN_CENTRE, "Best time: %.1f", besttime);
 
-		al_draw_textf(fontsmall, white, width, 0, ALLEGRO_ALIGN_RIGHT, "Best WPM: %i", bestwpm);
-		al_draw_textf(fontsmall, white, width, 40, ALLEGRO_ALIGN_RIGHT, "Best time: %.1f", besttime);
+		al_draw_textf(fontsmall, white, width, 0, ALLEGRO_ALIGN_RIGHT, "Words: %i", wordcount);
+		al_draw_textf(fontsmall, white, width, 40, ALLEGRO_ALIGN_RIGHT, "Best words %i", bestwords);
 
 		al_draw_ustr(font, grey, width/2, height/2, ALLEGRO_ALIGN_RIGHT, prev);
 		al_draw_ustr(font, white, width/2, height/2, ALLEGRO_ALIGN_LEFT, next);
